@@ -34,6 +34,16 @@ namespace PriceAlert
             this.OperationType = OperationType;
         }
 
+        public Message(byte MessageID, string AssetName, double TriggerPrice, byte OperationType, double PriceBuy, double PriceSell)
+        {
+            this.MessageID = MessageID;
+            this.AssetName = AssetName;
+            this.TriggerPrice = TriggerPrice;
+            this.OperationType = OperationType;
+            this.PriceBuy= PriceBuy;
+            this.PriceSell= PriceSell;
+        }
+
         public Message(byte MessageID, string AssetName, double TriggerPrice)
         {
             this.AssetName = AssetName;

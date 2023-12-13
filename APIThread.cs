@@ -53,13 +53,20 @@ namespace PriceAlert
                         switch (message.MessageID)
                         {
                             case Constants.opSubscribe:
-                                Console.WriteLine(String.Format("AssetName={0}", message.AssetName));
+                                Console.WriteLine(String.Format("Subscribe : AssetName={0}", message.AssetName));
                                 if (Assets != null)
                                 {
                                     if (!Assets.Contains(message.AssetName)) {
                                         Assets.Add(message.AssetName);
                                     }
                                 }                                
+                                break;
+                            case Constants.opUnsubscribe:
+                                Console.WriteLine(String.Format("Unsubscribe : AssetName={0}", message.AssetName));
+                                if (Assets.Contains(message.AssetName))
+                                {
+                                    Assets.Remove(message.AssetName);
+                                }
                                 break;
                         }
                     }

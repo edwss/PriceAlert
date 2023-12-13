@@ -83,17 +83,34 @@ namespace PriceAlert
         public void CheckPrice(string Asset, double Price)
         {
             List<Asset>? AssetList;
+            List<Asset>? AssetListToRemove = new List<Asset>();
             if (Assets.TryGetValue(Asset, out AssetList)) {
                 foreach (var asset in AssetList)
                 {
                     byte opResult = asset.CheckTrigger(Price);
                     switch (opResult)
                     {
-                        case Constants.opBuy: EmailThread.PostMessage(Constants.opSendAlert, Asset, Price, Constants.opBuy); break;
-                        case Constants.opSell: EmailThread.PostMessage(Constants.opSendAlert, Asset, Price, Constants.opSell); break;
+                        case Constants.opBuy: EmailThread.PostMessage(Constants.opSendAlert, Asset, Price, Constants.opBuy, asset.GetPriceBuy(), asset.GetPriceSell()); break;
+                        case Constants.opSell: EmailThread.PostMessage(Constants.opSendAlert, Asset, Price, Constants.opSell, asset.GetPriceBuy(), asset.GetPriceSell()); break;
+                    }
+                    if (opResult != 255)
+                    {
+                        AssetListToRemove.Add(asset);
                     }
                 }
-            }          
+            }
+
+            foreach (var asset in AssetListToRemove)
+            {
+                if (AssetList != null)
+                {
+                    AssetList.Remove(asset);
+                }                
+            }
+            if ((AssetList != null) && (AssetList.Count == 0))
+            {
+                APIThread.PostMessage(Constants.opUnsubscribe, Asset);
+            }
         }
     }
 }

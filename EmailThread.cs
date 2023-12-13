@@ -67,10 +67,10 @@ namespace PriceAlert
                                 switch (message.OperationType)
                                 {
                                     case Constants.opBuy:
-                                        Console.WriteLine(string.Format("Alert : AssetName={0} : Price={1} : Type=Buy : Email={3}", message.AssetName, message.TriggerPrice, report));
+                                        Console.WriteLine(string.Format("Alert : AssetName={0} : DesiredPrice={1} : Price={2} : Type=Buy : Email={3}", message.AssetName, message.PriceBuy, message.TriggerPrice, report));
                                         break;
                                     case Constants.opSell:
-                                        Console.WriteLine(string.Format("Alert : AssetName={0} : Price={1} : Type=Sell : Email={2}", message.AssetName, message.TriggerPrice, report));
+                                        Console.WriteLine(string.Format("Alert : AssetName={0} : DesiredPrice={1} : Price={2} : Type=Sell : Email={3}", message.AssetName, message.PriceSell, message.TriggerPrice, report));
                                         break;
                                 }
                                 break;
@@ -82,7 +82,7 @@ namespace PriceAlert
             }
         }
 
-        public static void PostMessage(byte MessageID, string AssetName, double TriggerPrice, byte OperationType)
+        public static void PostMessage(byte MessageID, string AssetName, double TriggerPrice, byte OperationType, double PriceBuy, double PriceSell)
         {
             InternalMessages?.Enqueue(new Message(MessageID, AssetName, TriggerPrice, OperationType));
         }

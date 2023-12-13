@@ -8,6 +8,7 @@ static class Constants
     public const byte PriceCheck = 1;
     // APIThread
     public const byte opSubscribe = 0;
+    public const byte opUnsubscribe = 1;
     // EmailThread
     public const byte opSendAlert = 0;
     // EmailThread Operations

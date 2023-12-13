@@ -27,5 +27,12 @@ namespace PriceAlert
             }
             return 255;
         }
+        public double GetPriceBuy() {
+            return PriceBuy;
+        }
+
+        public double GetPriceSell() {
+            return PriceSell;
+        }
     }
 }
