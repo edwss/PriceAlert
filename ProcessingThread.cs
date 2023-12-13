@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,10 @@ namespace PriceAlert
 {
     internal class ProcessingThread
     {
-        private Dictionary<string, Asset> Assets = [];
-        private ConcurrentQueue<Message> Messages;
+        private Dictionary<string, List<Asset>> Assets = [];
+        private static ConcurrentQueue<Message>? InternalMessages;
         public ProcessingThread(){
-            this.Messages = new ConcurrentQueue<Message>();
+            InternalMessages = new ConcurrentQueue<Message>();
         }
         public void Start()
         {
@@ -33,16 +34,31 @@ namespace PriceAlert
             {
                 try
                 {
-                    if (Messages.TryDequeue(out var message))
+                    if (InternalMessages != null)
                     {
-                        switch (message.MessageID)
+                        if (InternalMessages.TryDequeue(out var message))
                         {
-                            case Constants.addAsset: 
-                                Console.WriteLine(String.Format("Asset={0} : Price={1:N} : Operation={2:D}", message.AssetName, message.Price, message.OperationType));
-                                break;
+                            switch (message.MessageID)
+                            {
+                                case Constants.addAsset:
+                                    Console.WriteLine(String.Format("Asset={0} : PriceBuy={1:N} : PriceSell={2:N}", message.AssetName, message.PriceBuy, message.PriceSell));
+                                    List<Asset>? AssetList = null;
+                                    if (!Assets.TryGetValue(message.AssetName, out AssetList))
+                                    {
+                                        AssetList = new List<Asset>();
+                                        AssetList.Add(new Asset(message.PriceBuy, message.PriceSell));
+                                        Assets.Add(message.AssetName, AssetList);
+                                    }
+                                    else
+                                    {
+                                        AssetList.Add(new Asset(message.PriceBuy, message.PriceSell));
+                                    }
+                                    APIThread.PostMessage(Constants.opSubscribe, message.AssetName);
+                                    break;
+                            }
                         }
                     }
-                    Thread.Sleep(100);
+                    Thread.Sleep(100);  
                 }
                 catch (Exception exception)
                 {
@@ -51,9 +67,9 @@ namespace PriceAlert
             }
         }
 
-        public void PostAddAsset(byte MessageID, string AssetName, double Price, byte OperationType)
+        public static void PostMessage(byte MessageID, string AssetName, double PriceBuy, double PriceSell)
         {
-            Messages.Enqueue(new Message(MessageID, AssetName, Price, OperationType));
+            InternalMessages?.Enqueue(new Message(MessageID, AssetName, PriceBuy, PriceSell));
         }
     }
 }

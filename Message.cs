@@ -8,16 +8,30 @@ namespace PriceAlert
 {
     internal class Message
     {
-        public double Price;
+        public double PriceBuy;
+        public double PriceSell;
         public string AssetName;
         public byte OperationType;
         public byte MessageID;
-       public Message(byte MessageID, string AssetName, double Price, byte OperationType) 
+        public double TriggerPrice;
+       public Message(byte MessageID, string AssetName, double PriceBuy, double PriceSell) 
        {
             this.MessageID = MessageID;
             this.AssetName = AssetName;
-            this.Price = Price;
-            this.OperationType = OperationType;
+            this.PriceBuy = PriceBuy;
+            this.PriceSell = PriceSell;
        }
+        public Message(byte MessageID, string AssetName)
+        {
+            this.MessageID = MessageID;
+            this.AssetName = AssetName;
+        }
+        public Message(byte MessageID, string AssetName, double TriggerPrice, byte OperationType)
+        {
+            this.MessageID = MessageID;
+            this.AssetName= AssetName;
+            this.TriggerPrice = TriggerPrice;
+            this.OperationType = OperationType;
+        }
     }
 }

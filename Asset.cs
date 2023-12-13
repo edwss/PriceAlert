@@ -8,12 +8,12 @@ namespace PriceAlert
 {
     internal class Asset
     {
-        private string AsssetName = string.Empty;
         private double PriceBuy = -1;
         private double PriceSell = -1;
-        public Asset(string AssetName)
+        public Asset(double PriceBuy, double PriceSell)
         {
-            this.AsssetName = AssetName;
+            this.PriceBuy = PriceBuy;
+            this.PriceSell = PriceSell;
         }
     }
 }

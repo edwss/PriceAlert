@@ -3,18 +3,29 @@ using System;
 
 static class Constants
 {
+    // ProcessingThread
     public const byte addAsset = 0;
-
-    public const byte opSell = 0;
-    public const byte opBuy = 1;
+    // APIThread
+    public const byte opSubscribe = 0;
+    // EmailThread
+    public const byte opSendAlert = 0;
+    // EmailThread Operation
+    public const byte opBuy = 0;
+    public const byte opSell = 1;
 }
 
 internal class Program
 {
     private static void Main(string[] args)
     {
+        APIThread apiThread = new APIThread();
+        apiThread.Start();  
+
         ProcessingThread processingThread = new ProcessingThread();
         processingThread.Start();
+
+        EmailThread emailThread = new EmailThread();
+        emailThread.Start();
 
         while (true)
         {
@@ -24,8 +35,7 @@ internal class Program
         void ProcessUserInput(string UserInput)
         {
             string[] UserInputSplitted = UserInput.Split(' ');
-            processingThread.PostAddAsset(Constants.addAsset, UserInputSplitted[0], Convert.ToDouble(UserInputSplitted[1]), Constants.opSell);
-            processingThread.PostAddAsset(Constants.addAsset, UserInputSplitted[0], Convert.ToDouble(UserInputSplitted[2]), Constants.opBuy);
+            ProcessingThread.PostMessage(Constants.addAsset, UserInputSplitted[0], Convert.ToDouble(UserInputSplitted[1]), Convert.ToDouble(UserInputSplitted[2]));
         }
     }
 }
