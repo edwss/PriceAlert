@@ -54,16 +54,13 @@ namespace PriceAlert
                         {
                             case Constants.opSubscribe:
                                 Console.WriteLine(String.Format("Subscribe : AssetName={0}", message.AssetName));
-                                if (Assets != null)
-                                {
-                                    if (!Assets.Contains(message.AssetName)) {
-                                        Assets.Add(message.AssetName);
-                                    }
-                                }                                
+                                if ((Assets != null) && (!Assets.Contains(message.AssetName))) {
+                                    Assets.Add(message.AssetName);
+                                }                         
                                 break;
                             case Constants.opUnsubscribe:
                                 Console.WriteLine(String.Format("Unsubscribe : AssetName={0}", message.AssetName));
-                                if (Assets.Contains(message.AssetName))
+                                if ((Assets != null) && (Assets.Contains(message.AssetName)))
                                 {
                                     Assets.Remove(message.AssetName);
                                 }
@@ -83,24 +80,32 @@ namespace PriceAlert
 
         public void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
-            if (Assets != null)
+            try
             {
-                foreach (string asset in Assets)
+                if (Assets != null)
                 {
-                    Console.WriteLine(String.Format("Checking Price : Asset={0}", asset));
-                    HttpClient client = new HttpClient();
-                    client.BaseAddress = new Uri(URL);
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    string response = client.GetStringAsync(String.Format("{0}?token={1}", asset, ConfigurationManager.AppSettings.Get("API-Token"))).Result;
-                    JObject json = JObject.Parse(response);
-                    if (json != null) {
-                        string signal = Convert.ToString(json["results"][0]["regularMarketTime"]);
-                        double price = Convert.ToDouble(json["results"][0]["regularMarketPrice"]);
-                        Console.WriteLine(String.Format("Signal={0} : Price={1}", signal, price));
-                        ProcessingThread.PostMessage(Constants.PriceCheck, asset, price);
-                    }                    
-                    client.Dispose();
+                    foreach (string asset in Assets)
+                    {
+                        Console.WriteLine(String.Format("Checking Price : Asset={0}", asset));
+                        HttpClient client = new HttpClient();
+                        client.BaseAddress = new Uri(URL);
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        string response = client.GetStringAsync(String.Format("{0}?token={1}", asset, ConfigurationManager.AppSettings.Get("API-Token"))).Result;
+                        JObject json = JObject.Parse(response);
+                        if (json != null)
+                        {
+                            string signal = Convert.ToString(json["results"][0]["regularMarketTime"]);
+                            double price = Convert.ToDouble(json["results"][0]["regularMarketPrice"]);
+                            Console.WriteLine(String.Format("Signal={0} : Price={1}", signal, price));
+                            ProcessingThread.PostMessage(Constants.PriceCheck, asset, price);
+                        }
+                        client.Dispose();
+                    }
                 }
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception.ToString());
             }
         }
     }

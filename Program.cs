@@ -1,21 +1,6 @@
 ﻿using PriceAlert;
 using System;
 
-static class Constants
-{
-    // ProcessingThread
-    public const byte addAsset = 0;
-    public const byte PriceCheck = 1;
-    // APIThread
-    public const byte opSubscribe = 0;
-    public const byte opUnsubscribe = 1;
-    // EmailThread
-    public const byte opSendAlert = 0;
-    // EmailThread Operations
-    public const byte opBuy = 0;
-    public const byte opSell = 1;
-}
-
 internal class Program
 {
     private static void Main(string[] args)
@@ -29,18 +14,38 @@ internal class Program
         EmailThread emailThread = new EmailThread();
         emailThread.Start();
 
+        if (args.Length != 0)
+        {
+            ProcessUserInput(args);
+        }
+
         while (true)
         {
-            string? user_input = Console.ReadLine();
-            if (user_input != null)
+            try
             {
-                ProcessUserInput(user_input);
+                string? user_input = Console.ReadLine();
+                if (user_input != null)
+                {
+                    string[] UserInputSplitted = user_input.Split(' ');
+                    ProcessUserInput(UserInputSplitted);
+                }
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception.ToString());
             }
         }
-        void ProcessUserInput(string UserInput)
+
+        void ProcessUserInput(string[] args)
         {
-            string[] UserInputSplitted = UserInput.Split(' ');
-            ProcessingThread.PostMessage(Constants.addAsset, UserInputSplitted[0], Convert.ToDouble(UserInputSplitted[1]), Convert.ToDouble(UserInputSplitted[2]));
+            if (args.Length > 3)
+            {
+                ProcessingThread.PostMessage(Constants.addAsset, args[1], Convert.ToDouble(args[2]), Convert.ToDouble(args[3]));
+            }
+            else
+            {
+                ProcessingThread.PostMessage(Constants.addAsset, args[0], Convert.ToDouble(args[1]), Convert.ToDouble(args[2]));
+            }
         }
     }
 }

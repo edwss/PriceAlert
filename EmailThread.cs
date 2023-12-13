@@ -39,41 +39,36 @@ namespace PriceAlert
                 {
                     if (InternalMessages.TryDequeue(out var message))
                     {
-                        switch (message.MessageID)
+                        try
                         {
-                            case Constants.opSendAlert:
-                                string? report = ConfigurationManager.AppSettings.Get("Report");
-                                string? from = ConfigurationManager.AppSettings.Get("From");
-                                string body = string.Empty;
-                                if ((report != null) && (from != null)){
-                                    if (message.OperationType == Constants.opBuy) {
-                                        body = String.Format("{0} atigiu o valor {1} - {2}", message.AssetName, message.TriggerPrice, "Comprar");
-                                    }
-                                    else
+                            switch (message.MessageID)
+                            {
+                                case Constants.opSendAlert:
+                                    string? report = ConfigurationManager.AppSettings.Get("Report");
+                                    string? from = ConfigurationManager.AppSettings.Get("From");
+                                    string body = string.Empty;
+                                    if ((report != null) && (from != null))
                                     {
-                                        body = String.Format("{0} atigiu o valor {1} - {2}", message.AssetName, message.TriggerPrice, "Vender");
+                                        body = String.Format("{0} atigiu o valor {1} - {2}", message.AssetName, message.TriggerPrice, Constants.ConvertOperationToString(message.OperationType));
+                                        var smtpClient = new SmtpClient(ConfigurationManager.AppSettings.Get("STMP-Address"))
+                                        {
+                                            Port = Convert.ToInt32(ConfigurationManager.AppSettings.Get("STMP-Port")),
+                                            Credentials = new NetworkCredential(ConfigurationManager.AppSettings.Get("STMP-Username"), ConfigurationManager.AppSettings.Get("STMP-Password")),
+                                            EnableSsl = true,
+                                        };
+
+                                        smtpClient.Send(from, report, "PriceAlert", body);
                                     }
 
-                                    var smtpClient = new SmtpClient(ConfigurationManager.AppSettings.Get("STMP-Address"))
-                                    {
-                                        Port = Convert.ToInt32(ConfigurationManager.AppSettings.Get("STMP-Port")),
-                                        Credentials = new NetworkCredential(ConfigurationManager.AppSettings.Get("STMP-Username"), ConfigurationManager.AppSettings.Get("STMP-Password")),
-                                        EnableSsl = true,
-                                    };
-
-                                    smtpClient.Send(from, report, "PriceAlert", body);
-                                }
-
-                                switch (message.OperationType)
-                                {
-                                    case Constants.opBuy:
-                                        Console.WriteLine(string.Format("Alert : AssetName={0} : DesiredPrice={1} : Price={2} : Type=Buy : Email={3}", message.AssetName, message.PriceBuy, message.TriggerPrice, report));
-                                        break;
-                                    case Constants.opSell:
-                                        Console.WriteLine(string.Format("Alert : AssetName={0} : DesiredPrice={1} : Price={2} : Type=Sell : Email={3}", message.AssetName, message.PriceSell, message.TriggerPrice, report));
-                                        break;
-                                }
-                                break;
+                                    Console.WriteLine(string.Format("Alert : AssetName={0} : DesiredPrice={1} : Price={2} : Type={3} : Email={4}",
+                                                      message.AssetName, message.PriceBuy, message.TriggerPrice, Constants.ConvertOperationToString(message.OperationType), report)
+                                    );
+                                    break;
+                            }
+                        }
+                        catch (Exception exception)
+                        {
+                            Console.WriteLine(exception.ToString());
                         }
                     }
                 }
@@ -84,7 +79,7 @@ namespace PriceAlert
 
         public static void PostMessage(byte MessageID, string AssetName, double TriggerPrice, byte OperationType, double PriceBuy, double PriceSell)
         {
-            InternalMessages?.Enqueue(new Message(MessageID, AssetName, TriggerPrice, OperationType));
+            InternalMessages?.Enqueue(new Message(MessageID, AssetName, TriggerPrice, OperationType, PriceBuy, PriceSell));
         }
     }
 }

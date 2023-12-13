@@ -70,16 +70,6 @@ namespace PriceAlert
             }
         }
 
-        public static void PostMessage(byte MessageID, string AssetName, double PriceBuy, double PriceSell)
-        {
-            InternalMessages?.Enqueue(new Message(MessageID, AssetName, PriceBuy, PriceSell));
-        }
-
-        public static void PostMessage(byte MessageID, string AssetName, double Price)
-        {
-            InternalMessages?.Enqueue(new Message(MessageID, AssetName, Price));
-        }
-
         public void CheckPrice(string Asset, double Price)
         {
             List<Asset>? AssetList;
@@ -111,6 +101,16 @@ namespace PriceAlert
             {
                 APIThread.PostMessage(Constants.opUnsubscribe, Asset);
             }
+        }
+
+        public static void PostMessage(byte MessageID, string AssetName, double PriceBuy, double PriceSell)
+        {
+            InternalMessages?.Enqueue(new Message(MessageID, AssetName, PriceBuy, PriceSell));
+        }
+
+        public static void PostMessage(byte MessageID, string AssetName, double Price)
+        {
+            InternalMessages?.Enqueue(new Message(MessageID, AssetName, Price));
         }
     }
 }
