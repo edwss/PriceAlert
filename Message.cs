@@ -33,5 +33,12 @@ namespace PriceAlert
             this.TriggerPrice = TriggerPrice;
             this.OperationType = OperationType;
         }
+
+        public Message(byte MessageID, string AssetName, double TriggerPrice)
+        {
+            this.AssetName = AssetName;
+            this.MessageID = MessageID;
+            this.TriggerPrice = TriggerPrice;
+        }
     }
 }

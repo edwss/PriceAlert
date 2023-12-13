@@ -15,5 +15,17 @@ namespace PriceAlert
             this.PriceBuy = PriceBuy;
             this.PriceSell = PriceSell;
         }
+        public byte CheckTrigger(double Price)
+        {
+            if (Price <= PriceBuy)
+            {
+                return Constants.opBuy;
+            }
+            if (Price >= PriceSell)
+            {
+                return Constants.opSell;
+            }
+            return 255;
+        }
     }
 }

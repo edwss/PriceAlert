@@ -70,7 +70,7 @@ namespace PriceAlert
                                         Console.WriteLine(string.Format("Alert : AssetName={0} : Price={1} : Type=Buy : Email={3}", message.AssetName, message.TriggerPrice, report));
                                         break;
                                     case Constants.opSell:
-                                        Console.WriteLine(string.Format("Alert : AssetName={0} : Price={1} : Type=Sell : Email={3}", message.AssetName, message.TriggerPrice, report));
+                                        Console.WriteLine(string.Format("Alert : AssetName={0} : Price={1} : Type=Sell : Email={2}", message.AssetName, message.TriggerPrice, report));
                                         break;
                                 }
                                 break;

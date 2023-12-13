@@ -55,6 +55,9 @@ namespace PriceAlert
                                     }
                                     APIThread.PostMessage(Constants.opSubscribe, message.AssetName);
                                     break;
+                                case Constants.PriceCheck:
+                                    CheckPrice(message.AssetName, message.TriggerPrice);
+                                    break;
                             }
                         }
                     }
@@ -70,6 +73,27 @@ namespace PriceAlert
         public static void PostMessage(byte MessageID, string AssetName, double PriceBuy, double PriceSell)
         {
             InternalMessages?.Enqueue(new Message(MessageID, AssetName, PriceBuy, PriceSell));
+        }
+
+        public static void PostMessage(byte MessageID, string AssetName, double Price)
+        {
+            InternalMessages?.Enqueue(new Message(MessageID, AssetName, Price));
+        }
+
+        public void CheckPrice(string Asset, double Price)
+        {
+            List<Asset>? AssetList;
+            if (Assets.TryGetValue(Asset, out AssetList)) {
+                foreach (var asset in AssetList)
+                {
+                    byte opResult = asset.CheckTrigger(Price);
+                    switch (opResult)
+                    {
+                        case Constants.opBuy: EmailThread.PostMessage(Constants.opSendAlert, Asset, Price, Constants.opBuy); break;
+                        case Constants.opSell: EmailThread.PostMessage(Constants.opSendAlert, Asset, Price, Constants.opSell); break;
+                    }
+                }
+            }          
         }
     }
 }

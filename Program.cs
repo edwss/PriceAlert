@@ -5,11 +5,12 @@ static class Constants
 {
     // ProcessingThread
     public const byte addAsset = 0;
+    public const byte PriceCheck = 1;
     // APIThread
     public const byte opSubscribe = 0;
     // EmailThread
     public const byte opSendAlert = 0;
-    // EmailThread Operation
+    // EmailThread Operations
     public const byte opBuy = 0;
     public const byte opSell = 1;
 }
@@ -29,8 +30,11 @@ internal class Program
 
         while (true)
         {
-            string user_input = Console.ReadLine();
-            ProcessUserInput(user_input);
+            string? user_input = Console.ReadLine();
+            if (user_input != null)
+            {
+                ProcessUserInput(user_input);
+            }
         }
         void ProcessUserInput(string UserInput)
         {
